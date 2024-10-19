@@ -12,7 +12,7 @@ export const updateSession = async (request: NextRequest) => {
       },
     });
 
-    const supabase = createServerClient(
+    const supabaseAdmin = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
@@ -37,15 +37,20 @@ export const updateSession = async (request: NextRequest) => {
 
     // This will refresh session if expired - required for Server Components
     // https://supabase.com/docs/guides/auth/server-side/nextjs
-    const user = await supabase.auth.getUser();
+    const user = await supabaseAdmin.auth.getUser();
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
+    const authUser = !user.error
+    const guestOnly = user.error
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/protected", request.url));
+    // // protected routes
+    // if (request.nextUrl.pathname.startsWith("/protected") && guestOnly) {
+    //   console.log("guestOnly", guestOnly);
+      
+    //   return NextResponse.redirect(new URL("/sign-in", request.url));
+    // }
+    // if a user is logged in and tries going to homepage, redirect them to the protected page
+    if (request.nextUrl.pathname === "/" && authUser) {
+      return NextResponse.redirect(new URL("/protected?message=testing", request.url));
     }
 
     return response;
