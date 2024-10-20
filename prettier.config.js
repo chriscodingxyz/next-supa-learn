@@ -1,9 +1,5 @@
 module.exports = {
-  arrowParens: 'avoid',
-  bracketSpacing: true,
-  trailingComma: 'none',
-  tabWidth: 2,
+  ...require('prettier-standard'),
   semi: false,
   singleQuote: true,
-  jsxSingleQuote: true
 }
